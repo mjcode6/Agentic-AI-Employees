@@ -1,0 +1,1326 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order #{{ order.id }} - My Orders</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <style>
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --background: #f5f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .topbar {
+            background: linear-gradient(
+                135deg,
+                #1d4ed8,
+                #2563eb
+            );
+
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.18);
+        }
+
+        .brand {
+            color: white !important;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255,255,255,0.16);
+            margin-right: 10px;
+        }
+
+        .welcome {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.92rem;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255,255,255,0.35);
+            color: white;
+
+            border-radius: 9px;
+            padding: 7px 15px;
+
+            transition: 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+
+        /* =========================
+           PAGE
+        ========================= */
+
+        .page-wrapper {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 42px 20px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .back-btn {
+            border: 1px solid var(--border);
+            background: white;
+            color: #374151;
+
+            border-radius: 10px;
+            padding: 10px 16px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eff6ff;
+        }
+
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .modern-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            box-shadow:
+                0 8px 30px rgba(15, 23, 42, 0.05);
+
+            overflow: hidden;
+
+            margin-bottom: 24px;
+        }
+
+        .card-header-modern {
+            padding: 22px 25px;
+
+            border-bottom: 1px solid var(--border);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card-body-modern {
+            padding: 25px;
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 7px 13px;
+
+            border-radius: 999px;
+
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-pending .status-dot {
+            background: #f59e0b;
+        }
+
+        .status-dispatched {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-dispatched .status-dot {
+            background: #2563eb;
+        }
+
+        .status-delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-delivered .status-dot {
+            background: #22c55e;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-cancelled .status-dot {
+            background: #ef4444;
+        }
+
+
+        /* =========================
+           INFORMATION ITEMS
+        ========================= */
+
+        .info-item {
+            height: 100%;
+            padding: 18px;
+
+            background: #f8fafc;
+            border: 1px solid #eef0f4;
+
+            border-radius: 12px;
+        }
+
+        .info-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            margin-bottom: 7px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .product-value {
+            font-size: 1.15rem;
+        }
+
+        .amount-value {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+
+        /* =========================
+           DELIVERY
+        ========================= */
+
+        .delivery-box {
+            padding: 20px;
+
+            border-radius: 12px;
+
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+        }
+
+        .delivery-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 10px;
+
+            background: #dbeafe;
+            color: var(--primary);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 1.1rem;
+        }
+
+
+        /* =========================
+           TRACKING
+        ========================= */
+
+        .tracking-box {
+            background: #111827;
+            color: white;
+
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .tracking-label {
+            color: #9ca3af;
+            font-size: 0.75rem;
+
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .tracking-number {
+            font-family: monospace;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+
+        /* =========================
+           REFUND TABLE
+        ========================= */
+
+        .refund-count {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .refund-table {
+            margin: 0;
+        }
+
+        .refund-table thead th {
+            background: #f8fafc;
+
+            color: #6b7280;
+
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            font-weight: 700;
+
+            padding: 14px 18px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .refund-table tbody td {
+            padding: 17px 18px;
+            vertical-align: middle;
+
+            border-bottom: 1px solid #f0f1f3;
+        }
+
+        .refund-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .refund-id {
+            font-weight: 700;
+        }
+
+        .refund-reason {
+            max-width: 280px;
+            color: #4b5563;
+        }
+
+
+        /* =========================
+           REFUND STATUS
+        ========================= */
+
+        .refund-status {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 6px 11px;
+
+            border-radius: 999px;
+
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .refund-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .refund-approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .refund-denied {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+
+            margin: 0 auto 17px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eff6ff;
+            color: var(--primary);
+
+            font-size: 1.5rem;
+        }
+
+        .empty-title {
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .empty-text {
+            color: var(--muted);
+            margin: 0;
+        }
+
+
+        /* =========================
+           HELP CARD
+        ========================= */
+
+        .help-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    #1d4ed8,
+                    #2563eb
+                );
+
+            color: white;
+
+            border-radius: 16px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 12px 35px rgba(37, 99, 235, 0.2);
+        }
+
+        .help-icon {
+            width: 50px;
+            height: 50px;
+
+            border-radius: 12px;
+
+            background: rgba(255,255,255,0.15);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 1.3rem;
+        }
+
+        .help-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .help-text {
+            color: rgba(255,255,255,0.78);
+            margin: 0;
+        }
+
+        .help-btn {
+            background: white;
+            color: var(--primary);
+
+            border: none;
+
+            padding: 10px 19px;
+
+            border-radius: 9px;
+
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+        .help-btn:hover {
+            background: #eff6ff;
+            color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 767px) {
+
+            .page-wrapper {
+                padding: 28px 15px 45px;
+            }
+
+            .page-title {
+                font-size: 1.6rem;
+            }
+
+            .page-header {
+                align-items: flex-start !important;
+                gap: 18px;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+
+            .card-header-modern {
+                padding: 18px;
+            }
+
+            .card-body-modern {
+                padding: 18px;
+            }
+
+            .welcome {
+                display: none;
+            }
+
+            .help-card {
+                padding: 22px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<nav class="topbar">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center py-3">
+
+            <!-- Brand -->
+
+            <a
+                href="{% url 'orders_list' %}"
+                class="brand"
+            >
+
+                <span class="brand-icon">
+                    <i class="bi bi-box-seam"></i>
+                </span>
+
+                My Orders
+
+            </a>
+
+
+            <!-- User -->
+
+            <div class="d-flex align-items-center gap-3">
+
+                <span class="welcome">
+                    Welcome,
+                    <strong>{{ request.user.username }}</strong>
+                </span>
+
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="mb-0"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn logout-btn btn-sm"
+                    >
+                        <i class="bi bi-box-arrow-right me-1"></i>
+                        Logout
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+
+<main class="page-wrapper">
+
+
+    <!-- PAGE HEADER -->
+
+    <div
+        class="page-header d-flex justify-content-between align-items-center"
+    >
+
+        <div>
+
+            <h1 class="page-title">
+                Order #{{ order.id }}
+            </h1>
+
+            <p class="page-subtitle">
+                Complete details and activity for this order
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'orders_list' %}"
+            class="btn back-btn"
+        >
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Back to Orders
+
+        </a>
+
+    </div>
+
+
+
+    <!-- =================================================
+         ORDER INFORMATION
+    ================================================== -->
+
+    <section class="modern-card">
+
+
+        <!-- Header -->
+
+        <div class="card-header-modern">
+
+            <h2 class="card-title">
+                <i class="bi bi-receipt me-2 text-primary"></i>
+                Order Information
+            </h2>
+
+
+            <!-- Status -->
+
+            {% if order.status == "pending" %}
+
+                <span class="status-badge status-pending">
+
+                    <span class="status-dot"></span>
+
+                    Pending
+
+                </span>
+
+            {% elif order.status == "dispatched" %}
+
+                <span class="status-badge status-dispatched">
+
+                    <span class="status-dot"></span>
+
+                    Dispatched
+
+                </span>
+
+            {% elif order.status == "delivered" %}
+
+                <span class="status-badge status-delivered">
+
+                    <span class="status-dot"></span>
+
+                    Delivered
+
+                </span>
+
+            {% elif order.status == "cancelled" %}
+
+                <span class="status-badge status-cancelled">
+
+                    <span class="status-dot"></span>
+
+                    Cancelled
+
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- Body -->
+
+        <div class="card-body-modern">
+
+
+            <div class="row g-3">
+
+
+                <!-- Product -->
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+                            Product
+                        </div>
+
+                        <div class="info-value product-value">
+                            {{ order.product_name }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Amount -->
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+                            Amount
+                        </div>
+
+                        <div class="info-value amount-value">
+                            {{ order.amount }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Carrier -->
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+                            <i class="bi bi-truck me-1"></i>
+                            Carrier
+                        </div>
+
+                        <div class="info-value">
+
+                            {% if order.carrier %}
+
+                                {{ order.carrier }}
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Not available
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Tracking -->
+
+                <div class="col-md-6">
+
+                    <div class="tracking-box">
+
+                        <div class="tracking-label">
+                            Tracking Number
+                        </div>
+
+                        {% if order.tracking_number %}
+
+                            <div class="tracking-number">
+                                {{ order.tracking_number }}
+                            </div>
+
+                        {% else %}
+
+                            <div class="text-secondary mt-1">
+                                Not available
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Delivery -->
+
+                <div class="col-12">
+
+                    <div class="delivery-box">
+
+                        <div class="d-flex gap-3">
+
+                            <div class="delivery-icon">
+
+                                <i class="bi bi-geo-alt"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="info-label mb-1">
+                                    Delivery Information
+                                </div>
+
+                                {% if order.delivery %}
+
+                                    <div class="fw-semibold">
+                                        {{ order.delivery|linebreaksbr }}
+                                    </div>
+
+                                {% else %}
+
+                                    <div class="text-muted">
+                                        No delivery information available.
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Created -->
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+                            Order Created
+                        </div>
+
+                        <div class="info-value">
+
+                            <i class="bi bi-calendar3 me-1 text-primary"></i>
+
+                            {{ order.created_at|date:"d M Y, H:i" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Updated -->
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+                            Last Updated
+                        </div>
+
+                        <div class="info-value">
+
+                            <i class="bi bi-clock-history me-1 text-primary"></i>
+
+                            {{ order.updated_at|date:"d M Y, H:i" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         REFUND HISTORY
+    ================================================== -->
+
+    <section class="modern-card">
+
+
+        <div class="card-header-modern">
+
+            <h2 class="card-title">
+
+                <i class="bi bi-arrow-counterclockwise me-2 text-primary"></i>
+
+                Refund History
+
+            </h2>
+
+
+            <span class="refund-count">
+
+                {{ refunds|length }}
+
+                request{{ refunds|length|pluralize }}
+
+            </span>
+
+        </div>
+
+
+
+        {% if refunds %}
+
+            <div class="table-responsive">
+
+                <table class="table refund-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Refund ID
+                            </th>
+
+                            <th>
+                                Reason
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Requested
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for refund in refunds %}
+
+                            <tr>
+
+
+                                <!-- Refund ID -->
+
+                                <td>
+
+                                    <span class="refund-id">
+
+                                        #{{ refund.id }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Reason -->
+
+                                <td>
+
+                                    <div class="refund-reason">
+
+                                        {% if refund.reason %}
+
+                                            {{ refund.reason }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+
+                                                No reason provided
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Status -->
+
+                                <td>
+
+                                    {% if refund.status == "pending" %}
+
+                                        <span class="refund-status refund-pending">
+
+                                            <i class="bi bi-hourglass-split me-1"></i>
+
+                                            Pending
+
+                                        </span>
+
+                                    {% elif refund.status == "approved" %}
+
+                                        <span class="refund-status refund-approved">
+
+                                            <i class="bi bi-check-circle me-1"></i>
+
+                                            Approved
+
+                                        </span>
+
+                                    {% elif refund.status == "denied" %}
+
+                                        <span class="refund-status refund-denied">
+
+                                            <i class="bi bi-x-circle me-1"></i>
+
+                                            Denied
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- Requested -->
+
+                                <td>
+
+                                    <span class="text-muted">
+
+                                        {{ refund.created_at|date:"d M Y, H:i" }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Updated -->
+
+                                <td>
+
+                                    <span class="text-muted">
+
+                                        {{ refund.updated_at|date:"d M Y, H:i" }}
+
+                                    </span>
+
+                                </td>
+
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- Empty State -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="bi bi-arrow-counterclockwise"></i>
+
+                </div>
+
+
+                <h3 class="empty-title">
+
+                    No Refund Requests
+
+                </h3>
+
+
+                <p class="empty-text">
+
+                    There are no refund requests associated with this order.
+
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =================================================
+         NEED HELP visible by default
+    ================================================== -->
+
+    <section class="help-card">
+
+
+        <div class="row align-items-center">
+
+
+            <div class="col-md-8">
+
+
+                <div class="d-flex align-items-center gap-3">
+
+
+                    <div class="help-icon">
+
+                        <i class="bi bi-headset"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3 class="help-title">
+                            Need Help with This Order?
+                        </h3>
+
+                        <p class="help-text">
+                            Have a question about your order,
+                            delivery, tracking, or refund?
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-md-4 text-md-end mt-4 mt-md-0"
+            >
+
+                <button
+                    type="button"
+                    class="help-btn"
+                >
+
+                    <i class="bi bi-chat-dots me-2"></i>
+
+                    Need Help
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+    <!-- =================================================
+         chat box hiden by default
+    ================================================== -->
+<div id="chat-box" class="card">
+    <!-- Chat box header-->
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="card-title">Chat with Support</span>
+    </div>
+    <!-- Chat box header-->
+    <div id="chat-messages" class="chat-messages" style="height: 300px; overflow-y: auto;">
+        <!-- Messages will be appended here -->
+        <div agent-message class="agent-message">
+             Hello! How can I assist you with your order?
+    </div>
+    </div>
+    <div class="card-footer">
+        <input
+            type="text"
+            id="chat-input"
+            class="form-control"
+            placeholder="Type your message..."
+        >
+        <button
+            id="send-btn"
+            class="btn btn-primary mt-2"
+            onclick="sendMessage()"
+        >
+            Send Message
+        </button>
+    </div>
+</div>
+
+
+
+</main>
+
+
+
+<!-- Bootstrap JS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+>
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+
+    if (message) {
+        // Append user message to chat
+        const chatMessages = document.getElementById('chat-messages');
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'user-message';
+        userMessageDiv.textContent = message;
+        chatMessages.appendChild(userMessageDiv);
+
+        // Clear input
+        input.value = '';
+
+        // Scroll to the bottom of the chat
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Simulate agent response after a delay
+        setTimeout(() => {
+            const agentMessageDiv = document.createElement('div');
+            agentMessageDiv.className = 'agent-message';
+            agentMessageDiv.textContent = "Thank you for your message. We'll get back to you shortly.";
+            chatMessages.appendChild(agentMessageDiv);
+
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+    }
+}
+
+</script>
+
+
+</body>
+</html>
+
